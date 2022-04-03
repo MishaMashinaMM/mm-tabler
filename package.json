@@ -1,0 +1,26 @@
+{
+  "name": "mmtabler",
+  "version": "1.0.0",
+  "description": "MMTabler is a ready-made Angular component for displaying and handling the tabular display of one-dimensional json data. With various options to configure, MMTabler also features options for editing, deleting and adding new entries.",
+  "author": "Misha Mashina",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MishaMashinaMM/mm-tabler.git"
+  },
+  "homepage": "https://github.com/MishaMashinaMM/mm-tabler",
+  "keywords": [
+    "angular",
+    "javascript",
+    "typescript",
+    "tabler",
+    "table",
+    "mmtabler",
+    "mm-tabler",
+    "custom",
+    "misha mashina"
+  ],
+  "peerDependencies": {
+    "@angular/common": "^9.1.13",
+    "@angular/core": "^9.1.13"
+  }
+}

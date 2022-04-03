@@ -1,0 +1,233 @@
+<div class="main" id="mmtabler-main">
+  <div class="top" id="mmtabler-top"></div>
+  <table
+    class="mm-tabler"
+    id="mmtabler-table"
+    *ngIf="warningMessage == ''; else warnings"
+  >
+    <tr class="headers" id="mmtabler-headers-tr">
+      <th
+        *ngFor="let header of headers; let i = index"
+        id="mmtabler-headers-th"
+      >
+        <div class="th-headers">
+          <div
+            id="mmtabler-header-{{ header }}"
+            class="header"
+            [ngClass]="{
+              toUppercase: configuration.headersToUppercase,
+              toCapitalized: configuration.headersToCapitalized,
+              toLowercase: configuration.headersToLowercase
+            }"
+          >
+            {{ header }}
+          </div>
+          <div
+            class="sorting-icons"
+            (click)="sortColumnsNew(header)"
+            id="mmtabler-sorting-icons-{{ header }}"
+          >
+            <ng-container *ngIf="sorters[header] == null">
+              <div id="mmtabler-sorting-icon-double-{{ header }}">
+                &#8597;
+              </div></ng-container
+            >
+            <ng-container *ngIf="sorters[header] == false">
+              <div id="mmtabler-sorting-icon-down-{{ header }}">
+                &#8595;
+              </div></ng-container
+            >
+            <ng-container *ngIf="sorters[header] == true">
+              <div id="mmtabler-sorting-icon-up-{{ header }}">
+                &#8593;
+              </div></ng-container
+            >
+          </div>
+        </div>
+      </th>
+    </tr>
+    <tr
+      *ngFor="let item of dataFinal; let i = index"
+      id="mmtabler-tr-{{ i }}"
+      (click)="showOptions(item, i)"
+    >
+      <ng-container
+        *ngIf="
+          i < activePage * entriesToShow &&
+          i >= (activePage - 1) * entriesToShow
+        "
+      >
+        <td *ngFor="let key of headers" id="mmtabler-tr-{{ i }}-{{ key }}">
+          {{ item[key] }}
+        </td>
+      </ng-container>
+    </tr>
+  </table>
+
+  <ng-template #warnings>
+    <div
+      class="warning"
+      [innerHtml]="warningMessage"
+      id="mmtabler-warnings"
+    ></div>
+  </ng-template>
+
+  <div id="mmtabler-pointer" class="options-pointer-hidden">&#9650;</div>
+  <div
+    *ngIf="allowOptions"
+    id="mmtabler-optionsItem"
+    class="optionsItem-hidden"
+  >
+    <div
+      class="optionsBttnClose"
+      id="mmtabler-edit-close"
+      (click)="closeOptions()"
+    >
+      &#10006;
+    </div>
+
+    <div class="options-buttons-container">
+      <button
+        *ngIf="allowEdit"
+        [ngClass]="showOptionsEdit ? 'optionsBttn-selected' : 'optionsBttn'"
+        id="mmtabler-edit-bttn"
+        (click)="toggleOptionsIndividual('edit')"
+      >
+        {{ txtEdit }}
+      </button>
+      <button
+        *ngIf="allowDelete"
+        [ngClass]="showOptionsDelete ? 'optionsBttn-selected' : 'optionsBttn'"
+        id="mmtabler-delete-bttn"
+        (click)="toggleOptionsIndividual('delete')"
+      >
+        {{ txtDelete }}
+      </button>
+      <button
+        *ngIf="allowAdd"
+        [ngClass]="showOptionsAdd ? 'optionsBttn-selected' : 'optionsBttn'"
+        id="mmtabler-add-bttn"
+        (click)="toggleOptionsIndividual('add')"
+      >
+        {{ txtAdd }}
+      </button>
+    </div>
+    <!---->
+    <div *ngIf="showOptionsEdit" id="mmtabler-show-edit" class="show-options">
+      <div class="option-title" id="mmtabler-show-edit-text">{{ txtEdit }}</div>
+      <div
+        *ngFor="let c of editableContent | keyvalue"
+        class="show-options-edit"
+        id="mmtabler-show-edit-container"
+      >
+        <div
+          class="key-name"
+          id="mmtabler-show-edit-key"
+          [ngClass]="{
+            toUppercase: configuration.headersToUppercase,
+            toCapitalized: configuration.headersToCapitalized,
+            toLowercase: configuration.headersToLowercase
+          }"
+        >
+          {{ c.key }}
+        </div>
+        <textarea
+          id="mmtabler-show-edit-textarea"
+          class="option-edit-input"
+          [(ngModel)]="c.value"
+          (ngModelChange)="editField($event, c.key)"
+        ></textarea
+        ><br />
+      </div>
+      <div class="options-buttons" id="mmtabler-show-edit-buttons">
+        <button
+          class="optionsBttn"
+          (click)="toggleOptionsIndividual()"
+          id="mmtabler-show-edit-cancel-bttn"
+        >
+          {{ txtCancel }}
+        </button>
+        <button
+          class="optionsBttn"
+          (click)="saveEdit()"
+          id="mmtabler-show-edit-edit-button"
+        >
+          {{ txtEdit }}
+        </button>
+      </div>
+    </div>
+
+    <div
+      *ngIf="showOptionsDelete"
+      id="mmtabler-show-delete"
+      class="show-options"
+    >
+      <div class="option-title" id="mmtabler-show-delete-text">
+        {{ txtDelete }}
+      </div>
+      <div class="option-subtitle" id="mmtabler-show-delete-confirm">
+        {{ txtConfirmDelete }}
+      </div>
+      <div class="options-buttons" id="mmtabler-show-delete-buttons">
+        <button
+          class="optionsBttn"
+          (click)="toggleOptionsIndividual()"
+          id="mmtabler-show-delete-cancel-bttn"
+        >
+          {{ txtCancel }}
+        </button>
+        <button
+          class="optionsBttn"
+          (click)="doDelete()"
+          id="mmtabler-show-delete-cancel-bttn"
+        >
+          {{ txtDelete }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="showOptionsAdd" id="mmtabler-show-add" class="show-options">
+      <div class="option-title" id="mmtabler-show-add-text">{{ txtAdd }}</div>
+      <div
+        *ngFor="let c of addableContent | keyvalue"
+        class="show-options-edit"
+        id="mmtabler-show-add-container"
+      >
+        <div
+          class="key-name"
+          id="mmtabler-show-add-key"
+          [ngClass]="{
+            toUppercase: configuration.headersToUppercase,
+            toCapitalized: configuration.headersToCapitalized,
+            toLowercase: configuration.headersToLowercase
+          }"
+        >
+          {{ c.key }}
+        </div>
+        <textarea
+          id="mmtabler-show-add-textarea"
+          class="option-edit-input"
+          [(ngModel)]="c.value"
+          (ngModelChange)="addEntry($event, c.key)"
+        ></textarea
+        ><br />
+      </div>
+      <div class="options-buttons" id="mmtabler-show-add-buttons">
+        <button
+          class="optionsBttn"
+          (click)="toggleOptionsIndividual()"
+          id="mmtabler-show-add-cancel-bttn"
+        >
+          {{ txtCancel }}
+        </button>
+        <button
+          class="optionsBttn"
+          (click)="doAdd()"
+          id="mmtabler-show-add-cancel-bttn"
+        >
+          {{ txtAdd }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
